@@ -3,138 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EHB | Secure Payment Gateway</title>
+    <title>EHB | Secure Pay Gateway</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root { --accent: #00ffcc; --bkash: #d12053; --nagad: #f11b22; --bg: #f5f7fa; }
-        body, html { margin: 0; padding: 0; background: var(--bg); font-family: -apple-system, sans-serif; height: 100%; }
-
-        /* 🔒 CEO Login */
-        #login-box { height: 100vh; width: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; background: #000; z-index: 10000; position: fixed; }
+        body, html { margin: 0; padding: 0; background: var(--bg); font-family: -apple-system, sans-serif; height: 100%; overflow-x: hidden; }
+        #login-box { height: 100vh; width: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; background: #000; z-index: 10000; position: fixed; top: 0; left: 0; }
         .login-input { padding: 15px; background: #111; border: 2px solid #333; color: #fff; border-radius: 10px; margin-bottom: 15px; text-align: center; width: 80%; max-width: 300px; outline: none; }
         .login-btn { padding: 12px 40px; background: var(--accent); border: none; border-radius: 30px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
-
         #main-ui { display: none; padding-bottom: 80px; }
-
-        /* 📱 Status Bar */
         .status-bar { display: flex; justify-content: space-between; padding: 10px 20px; background: #fff; font-weight: 700; font-size: 14px; }
-
-        /* 💳 Wallet Header */
-        .wallet-header { text-align: center; padding: 30px 20px; background: #fff; margin-bottom: 10px; }
-        .wallet-circle { width: 80px; height: 80px; border: 2px solid #ddd; border-radius: 50%; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-        .wallet-circle img { width: 60%; opacity: 0.5; }
-        .amount-display { font-size: 24px; font-weight: 800; color: #333; margin-top: 10px; }
-
-        /* 🔄 Payment Methods */
+        .wallet-header { text-align: center; padding: 30px 20px; background: #fff; border-bottom: 1px solid #efefef; }
+        .amount-display { font-size: 24px; font-weight: 800; color: #333; margin-top: 5px; }
         .method-selector { display: flex; gap: 15px; padding: 15px; justify-content: center; }
-        .method-card { background: #fff; border: 1px solid #ddd; border-radius: 12px; padding: 15px; width: 120px; text-align: center; cursor: pointer; transition: 0.3s; }
-        .method-card.active { border: 2px solid var(--accent); transform: scale(1.05); }
-        .method-card img { width: 70px; height: auto; }
-
-        /* 📋 Instructions Card */
+        .method-card { background: #fff; border: 1px solid #ddd; border-radius: 12px; padding: 15px; width: 100px; text-align: center; cursor: pointer; }
+        .method-card.active { border: 2.5px solid var(--accent); transform: scale(1.05); }
+        .method-card img { width: 60px; }
         .instruction-card { margin: 15px; border-radius: 15px; color: #fff; padding: 25px 20px; }
         .bkash-bg { background: var(--bkash); }
         .nagad-bg { background: var(--nagad); }
-        
-        .ins-title { font-size: 18px; font-weight: 700; text-align: center; margin-bottom: 20px; }
-        .step { display: flex; gap: 12px; margin-bottom: 18px; font-size: 14px; line-height: 1.4; }
-        .step i { font-size: 8px; margin-top: 5px; }
-        
         .number-box { background: rgba(0,0,0,0.2); padding: 12px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; margin: 10px 0; }
-        .copy-btn { background: #fff; color: #000; border: none; padding: 5px 12px; border-radius: 5px; font-weight: 700; cursor: pointer; font-size: 12px; }
-
-        .tx-input { width: 100%; padding: 15px; border-radius: 10px; border: 1px solid #ddd; margin: 20px 0; box-sizing: border-box; text-align: center; font-size: 16px; outline: none; }
-
-        /* 🔘 Bottom Bar */
-        .bottom-action { position: fixed; bottom: 0; width: 100%; background: #fff; padding: 15px; box-sizing: border-box; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); }
-        .verify-btn { width: 100%; padding: 15px; background: #c00; color: #fff; border: none; border-radius: 10px; font-size: 18px; font-weight: 800; cursor: pointer; text-transform: uppercase; }
+        .copy-btn { background: #fff; color: #000; border: none; padding: 5px 12px; border-radius: 5px; font-weight: 700; cursor: pointer; }
+        .tx-input { width: calc(100% - 30px); padding: 15px; border-radius: 10px; border: 1px solid #ddd; margin: 20px 15px; box-sizing: border-box; text-align: center; font-size: 16px; outline: none; }
+        .bottom-action { position: fixed; bottom: 0; width: 100%; background: #fff; padding: 15px; box-sizing: border-box; }
+        .verify-btn { width: 100%; padding: 15px; background: #c00; color: #fff; border: none; border-radius: 10px; font-size: 18px; font-weight: 800; cursor: pointer; }
     </style>
 </head>
 <body>
-
     <div id="login-box">
-        <h2 style="color:var(--accent); margin-bottom:20px; font-family:monospace;">EHB PAY GATEWAY</h2>
-        <input type="password" id="pass" class="login-input" placeholder="Enter CEO Password">
+        <h2 style="color:var(--accent); margin-bottom:20px; font-family:monospace;">CEO PAY GATEWAY</h2>
+        <input type="password" id="pass" class="login-input" placeholder="Enter Password">
         <button onclick="unlock()" class="login-btn">Unlock Gateway</button>
     </div>
-
     <div id="main-ui">
-        <div class="status-bar">
-            <span>5:41</span>
-            <div style="display: flex; gap: 5px;"><i class="fas fa-signal"></i> <i class="fas fa-wifi"></i> <i class="fas fa-battery-three-quarters"></i> 46%</div>
-        </div>
-
+        <div class="status-bar"><span>6:56</span><span>4G 37%</span></div>
         <div class="wallet-header">
-            <div class="wallet-circle"><img src="https://cdn-icons-png.flaticon.com/512/522/522510.png"></div>
-            <div style="color:#666; font-size: 14px;">Wallet</div>
-            <div class="amount-display">৳ 250</div>
+            <div style="color:#666; font-size: 14px;">Total Payable</div>
+            <div class="amount-display">৳ 250.00</div>
         </div>
-
         <div class="method-selector">
             <div class="method-card active" onclick="switchMethod('bkash')"><img src="https://www.logo.wine/a/logo/BKash/BKash-Logo.wine.svg"></div>
             <div class="method-card" onclick="switchMethod('nagad')"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Nagad_Logo.svg/1200px-Nagad_Logo.svg.png"></div>
         </div>
-
         <div id="bkash-panel" class="instruction-card bkash-bg">
-            <div class="ins-title">ট্রানজেকশন আইডি দিন</div>
-            <div class="step">● <span>*247# ডায়াল করে আপনার bKash মোবাইল মেনুতে যান অথবা bKash অ্যাপে যান।</span></div>
-            <div class="step">● <span>"Send Money" -এ ক্লিক করুন।</span></div>
-            <div class="step">● <span>প্রাপক নম্বর হিসেবে এই নম্বরটি লিখুন:</span></div>
-            <div class="number-box">
-                <b id="bkash-num">01880774568</b>
-                <button class="copy-btn" onclick="copy('bkash-num')"><i class="fas fa-copy"></i> Copy</button>
-            </div>
-            <div class="step">● <span>টাকার পরিমাণ: <b>250</b></span></div>
-            <div class="step">● <span>নিশ্চিত করতে এখন আপনার bKash পিন লিখুন।</span></div>
+            <div class="number-box"><b id="bkash-num">01880774568</b><button class="copy-btn" onclick="copy('bkash-num')">Copy</button></div>
+            <p style="font-size:12px; opacity:0.9;">* Send Money করুন এই নাম্বারে এবং নিচে ট্রানজেকশন আইডি দিন।</p>
         </div>
-
         <div id="nagad-panel" class="instruction-card nagad-bg" style="display: none;">
-            <div class="ins-title">ট্রানজেকশন আইডি দিন</div>
-            <div class="step">● <span>*167# ডায়াল করে আপনার Nagad মোবাইল মেনুতে যান অথবা Nagad অ্যাপে যান।</span></div>
-            <div class="step">● <span>"Send Money" -এ ক্লিক করুন।</span></div>
-            <div class="step">● <span>প্রাপক নম্বর হিসেবে এই নম্বরটি লিখুন:</span></div>
-            <div class="number-box">
-                <b id="nagad-num">01333286309</b>
-                <button class="copy-btn" onclick="copy('nagad-num')"><i class="fas fa-copy"></i> Copy</button>
-            </div>
-            <div class="step">● <span>টাকার পরিমাণ: <b>250</b></span></div>
-            <div class="step">● <span>নিশ্চিত করতে এখন আপনার Nagad পিন লিখুন।</span></div>
+            <div class="number-box"><b id="nagad-num">01333286309</b><button class="copy-btn" onclick="copy('nagad-num')">Copy</button></div>
+            <p style="font-size:12px; opacity:0.9;">* Send Money করুন এই নাম্বারে এবং নিচে ট্রানজেকশন আইডি দিন।</p>
         </div>
-
-        <div style="padding: 0 15px;">
-            <input type="text" class="tx-input" placeholder="ট্রানজেকশন আইডি দিন">
-        </div>
-
-        <div class="bottom-action">
-            <button class="verify-btn" onclick="alert('Payment Verified Successfully!')">VERIFY</button>
-        </div>
+        <input type="text" class="tx-input" placeholder="ট্রানজেকশন আইডি দিন">
+        <div class="bottom-action"><button class="verify-btn" onclick="alert('ভেরিফিকেশন রিকোয়েস্ট পাঠানো হয়েছে!')">VERIFY</button></div>
     </div>
-
     <script>
         function unlock() {
             if(document.getElementById('pass').value === "asif2008") {
                 document.getElementById('login-box').style.display = 'none';
                 document.getElementById('main-ui').style.display = 'block';
-            } else { alert("ACCESS DENIED!"); }
+            } else { alert("ভুল পাসওয়ার্ড!"); }
         }
-
-        function switchMethod(method) {
+        function switchMethod(m) {
             document.querySelectorAll('.method-card').forEach(c => c.classList.remove('active'));
-            if(method === 'bkash') {
-                document.getElementById('bkash-panel').style.display = 'block';
-                document.getElementById('nagad-panel').style.display = 'none';
-                document.querySelectorAll('.method-card')[0].classList.add('active');
-            } else {
-                document.getElementById('bkash-panel').style.display = 'none';
-                document.getElementById('nagad-panel').style.display = 'block';
-                document.querySelectorAll('.method-card')[1].classList.add('active');
-            }
+            document.getElementById('bkash-panel').style.display = m==='bkash'?'block':'none';
+            document.getElementById('nagad-panel').style.display = m==='nagad'?'block':'none';
+            event.currentTarget.classList.add('active');
         }
-
         function copy(id) {
-            const num = document.getElementById(id).innerText;
-            navigator.clipboard.writeText(num);
-            alert("Number Copied: " + num);
+            navigator.clipboard.writeText(document.getElementById(id).innerText);
+            alert("নাম্বার কপি হয়েছে!");
         }
     </script>
 </body>
